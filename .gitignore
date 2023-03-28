@@ -1,4 +1,6 @@
 .idea
+/.idea
+/idea
 description.txt
 .gradle
 build/
