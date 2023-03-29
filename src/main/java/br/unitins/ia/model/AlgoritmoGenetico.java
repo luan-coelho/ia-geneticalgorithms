@@ -82,7 +82,7 @@ public class AlgoritmoGenetico {
         return horarios;
     }
 
-    private void calcularFitness(Individuo individuo, List<Disciplina> disciplinas, List<Sala> salas, List<Professor> professores) {
+    /*private void calcularFitness(Individuo individuo, List<Disciplina> disciplinas, List<Sala> salas, List<Professor> professores) {
         double fitness = 1.0;
         double penalidade = 0.0;
 
@@ -128,6 +128,35 @@ public class AlgoritmoGenetico {
 
         fitness -= penalidade / (disciplinas.size() * 2); // Dividir pela quantidade total de violações possíveis
         individuo.setFitness(fitness);
+    }*/
+
+
+    private double calcularFitness(Individuo individuo, List<Disciplina> disciplinas, List<Sala> salas, List<Professor> professores) {
+        int conflitos = 0;
+        List<Horario> horarios = individuo.getHorarios();
+
+        for (int i = 0; i < horarios.size(); i++) {
+            for (int j = i + 1; j < horarios.size(); j++) {
+                Horario horario1 = horarios.get(i);
+                Horario horario2 = horarios.get(j);
+
+                if (horario1.getDiaSemana() == horario2.getDiaSemana() &&
+                        horario1.isPeriodoMatutino() == horario2.isPeriodoMatutino()) {
+
+                    // Verifica se dois professores estão na mesma sala no mesmo horário
+                    if (horario1.getSala().getId() == horario2.getSala().getId()) {
+                        conflitos++;
+                    }
+
+                    // Verifica se o mesmo professor está ministrando duas disciplinas no mesmo horário
+                    if (horario1.getDisciplina().getProfessor().getId() == horario2.getDisciplina().getProfessor().getId()) {
+                        conflitos++;
+                    }
+                }
+            }
+        }
+
+        return 1.0 / (1 + conflitos);
     }
 
     private List<Individuo> selecionarPais(List<Individuo> populacao) {

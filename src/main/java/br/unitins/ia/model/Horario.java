@@ -15,4 +15,16 @@ public class Horario {
     private boolean periodoMatutino; // Matutino (true) ou Vespertino (false)
     private Sala sala;
     private Disciplina disciplina;
+
+    public String getDescricaoDiaSemana() {
+        return switch (diaSemana) {
+            case 1 -> "Segunda-feira";
+            case 2 -> "Terça-feira";
+            case 3 -> "Quarta-feira";
+            case 4 -> "Quinta-feira";
+            case 5 -> "Sexta-feira";
+            case 6 -> "Sábado";
+            default -> "Dia da semana inválido";
+        };
+    }
 }
