@@ -24,15 +24,4 @@ public class Individuo {
                 .collect(Collectors.toList());
         this.fitness = outroIndividuo.getFitness();
     }
-
-    public boolean professorOcupado(Professor professor, int diaSemana, boolean periodoMatutino) {
-        for (Horario horario : horarios) {
-            if (horario.getDisciplina().getProfessor().equals(professor) &&
-                    horario.getDiaSemana() == diaSemana &&
-                    horario.isPeriodoMatutino() == periodoMatutino) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -1,53 +1,50 @@
 package br.unitins.ia.model;
 
+import lombok.AllArgsConstructor;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+@AllArgsConstructor
 public class AlgoritmoGenetico {
-    private int tamanhoPopulacao;
-    private double taxaCrossover;
-    private double taxaMutacao;
-    private int maxGeracoes;
 
-    public AlgoritmoGenetico(int tamanhoPopulacao, double taxaCrossover, double taxaMutacao, int maxGeracoes) {
-        this.tamanhoPopulacao = tamanhoPopulacao;
-        this.taxaCrossover = taxaCrossover;
-        this.taxaMutacao = taxaMutacao;
-        this.maxGeracoes = maxGeracoes;
-    }
+    private final int tamanhoPopulacao;
+    private final double taxaCruzamento;
+    private final double taxaMutacao;
+    private final int maxGeracoes;
 
     public Individuo executar(List<Disciplina> disciplinas, List<Sala> salas, List<Professor> professores) {
-        // Inicialize a população
+        // Inicializar a população
         List<Individuo> populacao = inicializarPopulacao(disciplinas, salas, professores);
 
         int geracao = 0;
 
         while (geracao < maxGeracoes) {
-            // Avalie a população
+            // Avaliar a população
             for (Individuo individuo : populacao) {
-                calcularFitness(individuo, disciplinas, salas, professores);
+                calcularFitness(individuo);
             }
 
-            // Selecione os pais
+            // Seleciona os pais
             List<Individuo> pais = selecionarPais(populacao);
 
-            // Faça crossover
-            List<Individuo> filhos = crossover(pais);
+            // Cruzamento
+            List<Individuo> filhos = cruzamento(pais);
 
-            // Faça mutação
+            // Mutação
             mutacao(filhos, disciplinas, salas, professores);
 
-            // Substitua a população
+            // Substituir a população
             populacao = filhos;
 
             // Incrementar a geração
             geracao++;
         }
 
-        // Encontre o melhor indivíduo
-        Individuo melhorIndividuo = populacao.stream().max((i1, i2) -> Double.compare(i1.getFitness(), i2.getFitness())).orElse(null);
-        return melhorIndividuo;
+        // Encontrar o melhor indivíduo
+        return populacao.stream().max(Comparator.comparingDouble(Individuo::getFitness)).orElse(null);
     }
 
     private List<Individuo> inicializarPopulacao(List<Disciplina> disciplinas, List<Sala> salas, List<Professor> professores) {
@@ -82,56 +79,7 @@ public class AlgoritmoGenetico {
         return horarios;
     }
 
-    /*private void calcularFitness(Individuo individuo, List<Disciplina> disciplinas, List<Sala> salas, List<Professor> professores) {
-        double fitness = 1.0;
-        double penalidade = 0.0;
-
-        List<Horario> horarios = individuo.getHorarios();
-
-        // Verificar critérios 1 e 2
-        for (int i = 0; i < horarios.size(); i++) {
-            Horario horario1 = horarios.get(i);
-            for (int j = i + 1; j < horarios.size(); j++) {
-                Horario horario2 = horarios.get(j);
-
-                if (horario1.getDiaSemana() == horario2.getDiaSemana() && horario1.isPeriodoMatutino() == horario2.isPeriodoMatutino()) {
-                    // Critério 1: Dois professores não podem ocupar a mesma sala no mesmo horário
-                    if (horario1.getSala().getId() == horario2.getSala().getId()) {
-                        penalidade += 1;
-                    }
-
-                    // Critério 2: Um professor não pode ministrar duas disciplinas no mesmo horário
-                    if (horario1.getDisciplina().getProfessor().getId() == horario2.getDisciplina().getProfessor().getId()) {
-                        penalidade += 1;
-                    }
-                }
-            }
-        }
-
-        // Verificar critério 3
-        for (Horario horario : horarios) {
-            Disciplina disciplina = horario.getDisciplina();
-            Professor professor = disciplina.getProfessor();
-            boolean disponivel = false;
-
-            for (Disponibilidade disponibilidade : professor.getDisponibilidades()) {
-                if (disponibilidade.getDiaSemana() == horario.getDiaSemana() && disponibilidade.isPeriodoMatutino() == horario.isPeriodoMatutino()) {
-                    disponivel = true;
-                    break;
-                }
-            }
-
-            if (!disponivel) {
-                penalidade += 1;
-            }
-        }
-
-        fitness -= penalidade / (disciplinas.size() * 2); // Dividir pela quantidade total de violações possíveis
-        individuo.setFitness(fitness);
-    }*/
-
-
-    private double calcularFitness(Individuo individuo, List<Disciplina> disciplinas, List<Sala> salas, List<Professor> professores) {
+    private double calcularFitness(Individuo individuo) {
         int conflitos = 0;
         List<Horario> horarios = individuo.getHorarios();
 
@@ -178,7 +126,7 @@ public class AlgoritmoGenetico {
         return pais;
     }
 
-    private List<Individuo> crossover(List<Individuo> pais) {
+    private List<Individuo> cruzamento(List<Individuo> pais) {
         List<Individuo> filhos = new ArrayList<>();
         Random random = new Random();
 
@@ -186,7 +134,7 @@ public class AlgoritmoGenetico {
             Individuo pai1 = pais.get(i);
             Individuo pai2 = pais.get(tamanhoPopulacao - i - 1);
 
-            if (random.nextDouble() < taxaCrossover) {
+            if (random.nextDouble() < taxaCruzamento) {
                 int pontoCorte = random.nextInt(pai1.getHorarios().size());
 
                 Individuo filho1 = new Individuo();
@@ -217,11 +165,7 @@ public class AlgoritmoGenetico {
                 int indiceHorario = random.nextInt(filho.getHorarios().size());
                 Horario horarioAntigo = filho.getHorarios().get(indiceHorario);
                 List<Horario> horariosAleatorios = gerarHorariosAleatorios(disciplinas, salas, professores);
-                Horario horarioNovo = horariosAleatorios.stream().filter(h -> h.getDisciplina().getId() == horarioAntigo.getDisciplina().getId()).findFirst().orElse(null);
-
-                if (horarioNovo != null) {
-                    filho.getHorarios().set(indiceHorario, horarioNovo);
-                }
+                horariosAleatorios.stream().filter(h -> h.getDisciplina().getId() == horarioAntigo.getDisciplina().getId()).findFirst().ifPresent(horarioNovo -> filho.getHorarios().set(indiceHorario, horarioNovo));
             }
         }
     }

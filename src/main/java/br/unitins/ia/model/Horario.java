@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Horario {
 
-    private int diaSemana; // 1-5 (Segunda a Sexta-feira)
+    private int diaSemana; // 1-6 (Segunda a Sábado)
     private boolean periodoMatutino; // Matutino (true) ou Vespertino (false)
     private Sala sala;
     private Disciplina disciplina;

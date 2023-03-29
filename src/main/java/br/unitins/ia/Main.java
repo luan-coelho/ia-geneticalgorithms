@@ -10,7 +10,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        // Crie alguns professores com a suas disponibilidades
+        // Professores com a suas disponibilidades
         List<Professor> professores = new ArrayList<>();
         professores.add(new Professor(1, "Prof. Jeferson", List.of(new Disponibilidade(1, true))));
         professores.add(new Professor(2, "Prof. Tayse", List.of(new Disponibilidade(2, false))));
@@ -20,14 +20,15 @@ public class Main {
         professores.add(new Professor(6, "Prof. Mailson", List.of(new Disponibilidade(5, true))));
         professores.add(new Professor(7, "Prof. Bossô", Arrays.asList(new Disponibilidade(6, true), new Disponibilidade(2, false))));
 
-        // Crie algumas salas
+        // Salas
         List<Sala> salas = new ArrayList<>();
         salas.add(new Sala(1, "Sala 1"));
         salas.add(new Sala(2, "Sala 2"));
         salas.add(new Sala(3, "Labin IV"));
         salas.add(new Sala(4, "Labin II"));
+        salas.add(new Sala(5, "Labin III"));
 
-        // Crie algumas disciplinas
+        // Disciplinas
         List<Disciplina> disciplinas = new ArrayList<>();
         disciplinas.add(new Disciplina(1, "Interface homem máquina", professores.get(0)));
         disciplinas.add(new Disciplina(2, "Engenharia de qualidade", professores.get(1)));
@@ -36,19 +37,16 @@ public class Main {
         disciplinas.add(new Disciplina(5, "Mobile I", professores.get(4)));
         disciplinas.add(new Disciplina(6, "Redes II", professores.get(5)));
         disciplinas.add(new Disciplina(7, "Estatística Computacional", professores.get(6)));
-        disciplinas.add(new Disciplina(8, "Estágio supervisionado", professores.get(6)));
 
-        // Defina os parâmetros do algoritmo genético
-        int tamanhoPopulacao = 50;
+        // Parâmetros do algoritmo genético
+        int tamanhoPopulacao = 100;
         double taxaCrossover = 0.8;
         double taxaMutacao = 0.1;
         int maxGeracoes = 100;
 
-        // Execute o algoritmo genético
         AlgoritmoGenetico algoritmoGenetico = new AlgoritmoGenetico(tamanhoPopulacao, taxaCrossover, taxaMutacao, maxGeracoes);
         Individuo melhorIndividuo = algoritmoGenetico.executar(disciplinas, salas, professores);
 
-        // Exibir os resultados
         System.out.println("Melhor solução encontrada - Grade de Horários gerada:\n");
 
         melhorIndividuo.getHorarios().sort(Comparator.comparingInt(Horario::getDiaSemana));
